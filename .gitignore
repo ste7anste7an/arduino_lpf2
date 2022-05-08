@@ -1,0 +1,4 @@
+LMS_ESP32_firmware/build/
+sdkconfig.old
+sdkconfig
+*.o
