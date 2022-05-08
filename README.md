@@ -4,13 +4,13 @@ This is a proof of concept for integrating LPD2 sensoir uart in the BluePad code
 
 ## Arduino LPF2 library
 
-Based on the sensor emulation library https://github.com/lawrie/EV3_Dexter_Industries_Sensors/tree/master/EV3_arduino we extended this library to be compatible with both ESP32 and the new Lego Mindstorms Robot inventor and Lego SPIKE Prime.
+Based on the sensor emulation library https://github.com/lawrie/EV3_Dexter_Industries_Sensors/tree/master/EV3_arduino we extended this library to be compatible with both ESP32 and the new Lego Mindstorms Robot inventor and Lego SPIKE Prime. The library can be found in [LPF2](https://github.com/ste7anste7an/arduino_lpf2/tree/main/LMS_ESP32_firmware/components/LPF2).
 
 A precompiled firmware is avalailabel in [prebuild firmware](https://github.com/ste7anste7an/arduino_lpf2/tree/main/LMS_ESP32_firmware/firmware).
 
 An example of Mindstorms word block code is provided: [test_multi_sensor](https://github.com/ste7anste7an/arduino_lpf2/blob/main/Mindstorms_code/test_multi_sensor.lms) 
 
-In this testcode a strip of neopixels should e connected to Pin 12, and a servo motor to pin 23.
+In this testcode a strip of neopixels should be connected to Pin 12, and a servo motor to pin 23.
 
 ## Debug commands in Mindstorms App
 
@@ -51,3 +51,5 @@ An example myblock for driving neopixels is whoen below:
 
 ![debug word blocks](./images/neopixel_myblock.png?raw=true "Gamepad Blocks")
 
+When sensing a word to the sensor, we need to tranmit 2 skingle bytes to the specific mode. Somehow, when sending byte values 
+larger than 127, things get confused. Therefore, I use base 127 to convert from bytes to word: `byte_0 + 127*byte_1 = word`.
