@@ -6,9 +6,9 @@ This is a proof of concept for integrating LPD2 sensoir uart in the BluePad code
 
 Based on the sensor emulation library https://github.com/lawrie/EV3_Dexter_Industries_Sensors/tree/master/EV3_arduino we extended this library to be compatible with both ESP32 and the new Lego Mindstorms Robot inventor and Lego SPIKE Prime.
 
-A precompiled firmware is avalailabel in ![prebuild firmware](https://github.com/ste7anste7an/arduino_lpf2/tree/main/LMS_ESP32_firmware/firmware).
+A precompiled firmware is avalailabel in [prebuild firmware](https://github.com/ste7anste7an/arduino_lpf2/tree/main/LMS_ESP32_firmware/firmware).
 
-An example of Mindstorms word block code is provided: ![test_multi_sensor](https://github.com/ste7anste7an/arduino_lpf2/blob/main/Mindstorms_code/test_multi_sensor.lms) 
+An example of Mindstorms word block code is provided: [test_multi_sensor](https://github.com/ste7anste7an/arduino_lpf2/blob/main/Mindstorms_code/test_multi_sensor.lms) 
 
 In this testcode a strip of neopixels should e connected to Pin 12, and a servo motor to pin 23.
 
