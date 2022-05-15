@@ -55,7 +55,7 @@ class EV3UARTMode {
 	public:
 		EV3UARTMode();
 		String name;                      // The mode name
-		String symbol;                    // The unit symbol
+		String unit;                    // The unit symbol
 		byte sample_size;                 // The number of samples
 		byte data_type;                   // The data type 0= 8bits, 1=16 bits, 2=32 bits, 3=float
 		byte figures;                     // Number of significant digits
@@ -82,17 +82,19 @@ class EV3UARTEmulation {
 						 byte figures, byte decimals);
     void create_mode(String name, boolean view, 
                     byte data_type, byte sample_size, 
-             byte figures, byte decimals,
-             float raw_low, float raw_high,          // Low and high values for raw data
-                       float si_low, float si_high,            // Low and high values for SI data
-                       float pct_low, float pct_high);
+             		byte figures, byte decimals,
+             		float raw_low, float raw_high,              // Low and high values for raw data
+                    float pct_low, float pct_high,        
+                    float si_low, float si_high, // Low and high values for SI data
+					String unit);
      void create_mode(String name, boolean view, 
                     byte data_type, byte sample_size, 
-             byte figures, byte decimals,
-             float raw_low, float raw_high,          // Low and high values for raw data
-                       float si_low, float si_high,            // Low and high values for SI data
-                       float pct_low, float pct_high,
-                       byte mapin,byte mapout);
+             	    byte figures, byte decimals,
+             	    float raw_low, float raw_high,          // Low and high values for raw data
+                    float pct_low, float pct_high,
+					float si_low, float si_high,// Low and high values for SI data
+					String unit,
+                    byte mapin,byte mapout);
    
 		byte get_status();
 		void reset();

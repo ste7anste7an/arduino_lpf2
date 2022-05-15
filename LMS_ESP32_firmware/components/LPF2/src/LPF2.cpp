@@ -61,8 +61,9 @@ void EV3UARTEmulation::create_mode(String name, boolean view,
                                byte data_type, byte sample_size, 
                        byte figures, byte decimals, 
                        float raw_low, float raw_high,          // Low and high values for raw data
-                       float si_low, float si_high,            // Low and high values for SI data
-                       float pct_low, float pct_high) {
+                       float pct_low, float pct_high,
+                        float si_low, float si_high,            // Low and high values for SI data
+                        String unit) {
   EV3UARTMode* mode = new EV3UARTMode();
   mode->name = name;
   mode->view = view;
@@ -78,7 +79,7 @@ void EV3UARTEmulation::create_mode(String name, boolean view,
   mode->si_high=si_high;
   mode->pct_low=pct_low;
   mode->pct_high=pct_high;
-  
+  mode->unit=unit;
   mode_array[modes] = mode;
   modes++;
   if (view) views++;
@@ -88,8 +89,9 @@ void EV3UARTEmulation::create_mode(String name, boolean view,
                                byte data_type, byte sample_size, 
                        byte figures, byte decimals, 
                        float raw_low, float raw_high,          // Low and high values for raw data
-                       float si_low, float si_high,            // Low and high values for SI data
                        float pct_low, float pct_high,
+                       float si_low, float si_high,            // Low and high values for SI data
+                       String unit,
                        byte mapin,byte mapout) {
   EV3UARTMode* mode = new EV3UARTMode();
   mode->name = name;
@@ -105,6 +107,7 @@ void EV3UARTEmulation::create_mode(String name, boolean view,
   mode->si_high=si_high;
   mode->pct_low=pct_low;
   mode->pct_high=pct_high;
+  mode->unit=unit;
   mode->maps=true;
   mode->mapin=mapin;
   mode->mapout=mapout;
@@ -194,7 +197,16 @@ void EV3UARTEmulation::reset () {
        data.f=mode->pct_high;
        get_long(data.l, b_range+5);  
        send_cmd(CMD_INFO|(3 << CMD_LLL_SHIFT) | i,b_range,9); 
-
+      //  byte l_unit = mode->unit.length();
+		  //  byte ll_unit = next_power2(l_unit);
+		  //  byte bb_unit[ll_unit+2];
+		  //  bb_unit[0] = SYM;  //  info_unit
+      //  memset(bb_unit+1,0,ll_unit); // fill all bytes with 0
+		  //  mode->unit.getBytes(&bb_unit[1],l_unit+1); // Leave room for null terminator
+		  //  byte lll_unit = log2(ll_unit);
+		  // // Send info_unit
+      // Serial.printf("l_unit %d, ll_unit %d, lll_unit %d",l_unit,ll_unit,lll_unit);
+		  //  send_cmd(CMD_INFO | (lll_unit << CMD_LLL_SHIFT) | i, bb_unit, ll_unit+1);
        
     }
     if (mode->maps) { //send mapin and mapout
@@ -310,7 +322,6 @@ void EV3UARTEmulation::heart_beat() {
           //  Serial.printf("%02X ",ch);
           //  for(byte i=0; i<s; i++) {
           //   Serial.printf(" %02X",buf[i]);
-          //   
           //  }
             if (ch & CMD_DATA) { // only call callback when CMD_DATA
               EV3UARTMode* cur_mode=get_mode(mode);

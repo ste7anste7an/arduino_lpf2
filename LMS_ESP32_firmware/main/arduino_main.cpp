@@ -94,22 +94,46 @@ void onDisconnectedGamepad(GamepadPtr gp) {
 uint8_t old_led=0,rumble_force,rumble_duration;
 
 
-void parse_cmd_short(byte buf[],byte s) {
+void servo_neo_callback(byte buf[],byte s) {
 byte nr_short=int(s/2);
   short vals[nr_short];
-  Serial.println();
+  // Serial.printf("size %d, nr short %d\n",s,nr_short);
   for (int i=0; i<nr_short; i++) {
     vals[i]=buf[i*2]+buf[i*2+1]*128;
     // Serial.printf("vals[%d]=%d\n",i,vals[i]);
   }
 
-  if (vals[0]&4096) { // servo}
-    Serial.printf("servo %d %d %d %d\n",vals[0],vals[1],vals[2],vals[3]);
-    servo1.write(vals[0]&0xfff);
-    servo2.write(vals[1]);
-    servo3.write(vals[2]);
-    servo4.write(vals[3]);
-  } else if (vals[0]==65) { // write led
+  // Serial.printf("servo %d %d %d %d\n",vals[0],vals[1],vals[2],vals[3]);
+  servo1.write(vals[0]);
+  servo2.write(vals[1]);
+  servo3.write(vals[2]);
+  servo4.write(vals[3]);
+ 
+  if (buf[8]==65) { // write led
+     strip->show();
+  } else if (buf[8]==66) { // init led
+     delete strip;
+     strip=new Adafruit_NeoPixel(buf[9],buf[10]); //nr_leds, pin
+  } else if (buf[8]==67) { // clear all leds led
+      for (int i=0; i<strip->numPixels(); i++ ) {
+        strip->setPixelColor(i,0,0,0);
+      }
+  } else {
+      strip->setPixelColor(buf[8],buf[9],buf[10],buf[11]);
+  }
+
+}
+
+void neopixel_callback(byte buf[],byte s) {
+byte nr_short=int(s/2);
+  short vals[nr_short];
+  // Serial.println();
+  for (int i=0; i<nr_short; i++) {
+    vals[i]=buf[i*2]+buf[i*2+1]*128;
+    // Serial.printf("vals[%d]=%d\n",i,vals[i]);
+  }
+
+  if (vals[0]==65) { // write led
      strip->show();
   } else if (vals[0]==66) { // init led
       delete strip;
@@ -120,19 +144,17 @@ byte nr_short=int(s/2);
   }
 }
 
-    //servo1.write(vals[0]);
-    //servo2.write(vals[1]);
-    //servo3.write(vals[2]);
-    //servo4.write(vals[3]);
-
-  
 
 
 // Arduino setup function. Runs in CPU 1
 void setup() {
     Serial.begin(115200);
-    sensor.create_mode("TEST0", true, DATA16, 4, 5, 0,0.0f,500.0f,0.0f,100.0f,0.0f,1024.0f,0,ABSOLUTE); //map in and map out
-    sensor.get_mode(0)->setCallback(parse_cmd_short);  // attach call back function to mode 0
+    sensor.create_mode("GAMEPAD", true, DATA16, 6, 5, 0,0.0f,512.0f,0.0f,1024.0f,0.0f,100.0f,"XYBD",0,ABSOLUTE); //map in and map out unit = "XYBD" = x, y, buttons, d-pad
+    sensor.create_mode("NEOPIXEL", true, DATA16, 4, 5, 0,0.0f,500.0f,0.0f,100.0f,0.0f,1024.0f,"NRGB", 0,ABSOLUTE); //map in and map out, units='NRGB'
+    sensor.create_mode("GAMEPAD2", true, DATA16, 4, 5, 0,0.0f,512.0f,0.0f,1024.0f,0.0f,100.0f,"XYBD",0,ABSOLUTE); //map in and map out unit = "XYBD" = x, y, buttons, d-pad
+  
+    sensor.get_mode(0)->setCallback(servo_neo_callback);  // attach call back function to mode 0
+    sensor.get_mode(1)->setCallback(neopixel_callback);  // attach neopixel call back function to mode 1
     Wire.begin(5,4); // sda=pin(5), scl=Pin(4)
     strip->begin();
     strip->show(); // Initialize all pixels to 'off'
@@ -192,25 +214,41 @@ void loop() {
     }
 
 
-sensor.heart_beat();
-  if (millis() - last_reading > 20) {
-    int mode=sensor.get_current_mode();
-    if (mode==0) {
-      short bb[4];
+  sensor.heart_beat();
+    if (millis() - last_reading > 20) {
+      int mode=sensor.get_current_mode();
+      if (mode==0) {
+        short bb[8];
 
-    if (myGamepad && myGamepad->isConnected()) {
-        //myGamepad->buttons(),myGamepad->dpad(),
-         bb[0]=myGamepad->axisX();
-         bb[1]=myGamepad->axisY();
-         bb[2]=myGamepad->buttons();
-         bb[3]=myGamepad->dpad();
-//         myGamepad->axisRX(),myGamepad->axisRY());
+        if (myGamepad && myGamepad->isConnected()) {
+          //myGamepad->buttons(),myGamepad->dpad(),
+          bb[0]=myGamepad->axisX();
+          bb[1]=myGamepad->axisY();
+          bb[2]=myGamepad->axisRX();
+          bb[3]=myGamepad->axisRY();
+          bb[4]=myGamepad->buttons();
+          bb[5]=myGamepad->dpad();
+  //         myGamepad->axisRX(),myGamepad->axisRY());
+        }
+        sensor.send_data16(bb,8);
+      } 
+      else if (mode==2) {
+        short bb[4];
+
+        if (myGamepad && myGamepad->isConnected()) {
+          //myGamepad->buttons(),myGamepad->dpad(),
+          bb[0]=myGamepad->axisRX();
+          bb[1]=myGamepad->axisRY();
+          bb[2]=myGamepad->buttons();
+          bb[3]=myGamepad->dpad();
+        }
+
+        sensor.send_data16(bb,4); 
+      } 
+      else   Serial.printf("mode=%d\n",mode);
+
+      last_reading = millis();
     }
-    sensor.send_data16(bb,4);
-    } else
-    Serial.printf("mode=%d\n",mode);
-    last_reading = millis();
-  }
 
 
    
