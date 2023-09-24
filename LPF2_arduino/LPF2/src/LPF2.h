@@ -15,6 +15,7 @@
 #define   CMD_WRITE                     0x46 // sensor stuurt dit na NACK vaaf hub
 #define   CMD_MODES                     0x49
 #define   CMD_SPEED                     0x52
+#define   CMD_VERSION                   0x5f
 #define   CMD_MASK                      0xC0
 #define   CMD_INFO                      0x80
 #define   CMD_LLL_MASK                  0x38
