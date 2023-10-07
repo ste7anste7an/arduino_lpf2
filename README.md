@@ -1,6 +1,6 @@
 # arduino_lpf2
 
-This is a proof of concept for integrating LPF2 sensor uart in the BluePad32 code.
+This is a proof of concept for integrating LPF2 sensor emulation in the BluePad32 code.
 
 ## Arduino LPF2 library
 
